@@ -31,3 +31,15 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Arquivos de configuração sensíveis
+application-*.properties
+
+# Logs
+*.log
+
+# Arquivos de build
+*.class
+*.jar
+*.war
+*.ear
