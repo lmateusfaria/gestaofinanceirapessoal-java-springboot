@@ -79,7 +79,7 @@ public class DBService {
         // Transações
         // ==========================
         Transacao t1 = new Transacao(null, "Compra supermercado", 1.0,
-                LocalDate.now(), LocalDate.now().plusDays(30), null,
+                LocalDate.now(), LocalDate.now(), LocalDate.now(),
                 350.0, TipoTransacao.DEBITO, Status.ABERTO, conta1, cc1);
 
         Transacao t2 = new Transacao(null, "Salário", 1.0,
