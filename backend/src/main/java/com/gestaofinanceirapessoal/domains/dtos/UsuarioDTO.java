@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UsuarioDTO {
 
@@ -35,6 +38,9 @@ public class UsuarioDTO {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataCriacao = LocalDate.now();
 
+    private List<Long> contasIds = new ArrayList<>();
+    private List<Long> centrosCustoIds = new ArrayList<>();
+
     public UsuarioDTO() {}
 
     public UsuarioDTO(Usuario usuario) {
@@ -44,6 +50,12 @@ public class UsuarioDTO {
         this.email = usuario.getEmail();
         // ⚠️ senha não entra aqui, para não expor em responses
         this.dataCriacao = usuario.getDataCriacao();
+        this.contasIds = usuario.getContas().stream()
+                .map(conta -> conta.getId())
+                .collect(Collectors.toList());
+        this.centrosCustoIds = usuario.getCentrosCusto().stream()
+                .map(centroCusto -> centroCusto.getId())
+                .collect(Collectors.toList());
     }
 
     // Getters e Setters -------------------
@@ -65,4 +77,20 @@ public class UsuarioDTO {
 
     public LocalDate getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDate dataCriacao) { this.dataCriacao = dataCriacao; }
+
+    public List<Long> getContasIds() {
+        return contasIds;
+    }
+
+    public void setContasIds(List<Long> contasIds) {
+        this.contasIds = contasIds;
+    }
+
+    public List<Long> getCentrosCustoIds() {
+        return centrosCustoIds;
+    }
+
+    public void setCentrosCustoIds(List<Long> centrosCustoIds) {
+        this.centrosCustoIds = centrosCustoIds;
+    }
 }

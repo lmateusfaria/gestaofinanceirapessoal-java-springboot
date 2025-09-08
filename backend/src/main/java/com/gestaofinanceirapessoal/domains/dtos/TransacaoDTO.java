@@ -25,6 +25,9 @@ public class TransacaoDTO {
     private Double valorDocumento;
     private TipoTransacao tipoTransacao;
     private Status status;
+    
+    private Long contaId;
+    private Long centroCustoId;
 
     public TransacaoDTO() {}
 
@@ -38,6 +41,8 @@ public class TransacaoDTO {
         this.valorDocumento = transacao.getValorDocumento();
         this.tipoTransacao = transacao.getTipoTransacao();
         this.status = transacao.getStatus();
+        this.contaId = transacao.getConta() != null ? transacao.getConta().getId() : null;
+        this.centroCustoId = transacao.getCentroCusto() != null ? transacao.getCentroCusto().getId() : null;
     }
 
     public Long getId() {
@@ -110,5 +115,21 @@ public class TransacaoDTO {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Long getContaId() {
+        return contaId;
+    }
+
+    public void setContaId(Long contaId) {
+        this.contaId = contaId;
+    }
+
+    public Long getCentroCustoId() {
+        return centroCustoId;
+    }
+
+    public void setCentroCustoId(Long centroCustoId) {
+        this.centroCustoId = centroCustoId;
     }
 }

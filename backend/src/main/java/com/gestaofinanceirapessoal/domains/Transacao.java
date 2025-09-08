@@ -67,12 +67,12 @@ public class Transacao {
         this.id = dto.getId();
         this.descricao = dto.getDescricao();
         this.parcela = dto.getParcela();
-        this.dataTransacao = dto.getDataTransacao();
-        this.dataVencimento = dto.getDataVencimento();
-        this.dataBaixa = dto.getDataBaixa();
+        this.dataTransacao = LocalDate.now();
+        this.dataVencimento = LocalDate.now();
+        this.dataBaixa = LocalDate.now();
         this.valorDocumento = dto.getValorDocumento();
         this.tipoTransacao = dto.getTipoTransacao();
-        this.status = dto.getStatus();
+        this.status = Status.BAIXADO;
     }
 
     public Long getId() {
