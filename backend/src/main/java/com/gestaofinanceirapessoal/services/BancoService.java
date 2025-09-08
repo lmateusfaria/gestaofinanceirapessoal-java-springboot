@@ -3,6 +3,7 @@ package com.gestaofinanceirapessoal.services;
 import com.gestaofinanceirapessoal.domains.Banco;
 import com.gestaofinanceirapessoal.domains.dtos.BancoDTO;
 import com.gestaofinanceirapessoal.repositories.BancoRepository;
+import com.gestaofinanceirapessoal.repositories.ContaRepository;
 import com.gestaofinanceirapessoal.services.exceptions.DataIntegrityViolationException;
 import com.gestaofinanceirapessoal.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ public class BancoService {
 
     @Autowired
     private BancoRepository bancoRepo;
+
+    @Autowired
+    private ContaRepository contaRepo;
 
     public List<BancoDTO> findAll() {
         return bancoRepo.findAll().stream()
@@ -33,14 +37,30 @@ public class BancoService {
         dto.setId(null);
         validaCnpj(dto);
         Banco obj = new Banco(dto);
+
+        if (dto.getContasIds() != null && !dto.getContasIds().isEmpty()) {
+            obj.setContas(dto.getContasIds().stream()
+                    .map(id -> contaRepo.findById(id)
+                            .orElseThrow(() -> new ObjectNotFoundException("Conta não encontrada! Id: " + id)))
+                    .collect(Collectors.toList()));
+        }
+
         return bancoRepo.save(obj);
     }
 
-    public Banco update(Long id, BancoDTO dto) {
-        dto.setId(id);
-        Banco oldObj = findById(id);
+    public Banco update(Long bancoId, BancoDTO dto) {
+        dto.setId(bancoId);
+        Banco oldObj = findById(bancoId);
         validaCnpj(dto);
         oldObj = new Banco(dto);
+
+        if (dto.getContasIds() != null && !dto.getContasIds().isEmpty()) {
+            oldObj.setContas(dto.getContasIds().stream()
+                    .map(id -> contaRepo.findById(id)
+                            .orElseThrow(() -> new ObjectNotFoundException("Conta não encontrada! Id: " + id)))
+                    .collect(Collectors.toList()));
+        }
+
         return bancoRepo.save(oldObj);
     }
 

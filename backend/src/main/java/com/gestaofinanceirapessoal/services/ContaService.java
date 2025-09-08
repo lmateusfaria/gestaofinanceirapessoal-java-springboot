@@ -3,6 +3,7 @@ package com.gestaofinanceirapessoal.services;
 import com.gestaofinanceirapessoal.domains.Conta;
 import com.gestaofinanceirapessoal.domains.dtos.ContaDTO;
 import com.gestaofinanceirapessoal.repositories.ContaRepository;
+import com.gestaofinanceirapessoal.repositories.UsuarioRepository;
 import com.gestaofinanceirapessoal.services.exceptions.DataIntegrityViolationException;
 import com.gestaofinanceirapessoal.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class ContaService {
 
     @Autowired
     private ContaRepository contaRepo;
+
+    @Autowired
+    private UsuarioRepository usuarioRepo;
 
     public List<ContaDTO> findAll() {
         return contaRepo.findAll().stream()
@@ -31,6 +35,12 @@ public class ContaService {
     public Conta create(ContaDTO dto) {
         dto.setId(null);
         Conta obj = new Conta(dto);
+
+        if (dto.getUsuarioId() != null) {
+            obj.setUsuario(usuarioRepo.findById(dto.getUsuarioId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado! Id: " + dto.getUsuarioId())));
+        }
+
         return contaRepo.save(obj);
     }
 
@@ -38,6 +48,12 @@ public class ContaService {
         dto.setId(id);
         Conta oldObj = findById(id);
         oldObj = new Conta(dto);
+
+        if (dto.getUsuarioId() != null) {
+            oldObj.setUsuario(usuarioRepo.findById(dto.getUsuarioId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado! Id: " + dto.getUsuarioId())));
+        }
+
         return contaRepo.save(oldObj);
     }
 

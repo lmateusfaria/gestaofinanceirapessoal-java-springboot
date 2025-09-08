@@ -3,6 +3,7 @@ package com.gestaofinanceirapessoal.services;
 import com.gestaofinanceirapessoal.domains.Transacao;
 import com.gestaofinanceirapessoal.domains.dtos.TransacaoDTO;
 import com.gestaofinanceirapessoal.repositories.TransacaoRepository;
+import com.gestaofinanceirapessoal.repositories.ContaRepository;
 import com.gestaofinanceirapessoal.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ public class TransacaoService {
 
     @Autowired
     private TransacaoRepository transacaoRepo;
+
+    @Autowired
+    private ContaRepository contaRepo;
 
     public List<TransacaoDTO> findAll() {
         return transacaoRepo.findAll().stream()
@@ -30,6 +34,12 @@ public class TransacaoService {
     public Transacao create(TransacaoDTO dto) {
         dto.setId(null);
         Transacao obj = new Transacao(dto);
+
+        if (dto.getContaId() != null) {
+            obj.setConta(contaRepo.findById(dto.getContaId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Conta não encontrada! Id: " + dto.getContaId())));
+        }
+
         return transacaoRepo.save(obj);
     }
 
@@ -37,11 +47,16 @@ public class TransacaoService {
         dto.setId(id);
         Transacao oldObj = findById(id);
         oldObj = new Transacao(dto);
+
+        if (dto.getContaId() != null) {
+            oldObj.setConta(contaRepo.findById(dto.getContaId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Conta não encontrada! Id: " + dto.getContaId())));
+        }
+
         return transacaoRepo.save(oldObj);
     }
 
     public void delete(Long id) {
-        Transacao obj = findById(id);
         transacaoRepo.deleteById(id);
     }
 }

@@ -13,15 +13,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class OpenApiConfig {
-    @Value("${app.version}")
-    private String appVersion;
 
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("Gestão Financeira Pessoal API")
-                        .version(appVersion)
+                        .version("1.0.0")
                         .description("API REST para gerenciamento de finanças pessoais, incluindo controle de transações, categorias, cartões de crédito e pendências financeiras.")
                         .contact(new Contact()
                                 .name("Equipe de Desenvolvimento")

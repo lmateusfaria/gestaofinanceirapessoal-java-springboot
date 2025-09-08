@@ -3,6 +3,7 @@ package com.gestaofinanceirapessoal.services;
 import com.gestaofinanceirapessoal.domains.CentroCusto;
 import com.gestaofinanceirapessoal.domains.dtos.CentroCustoDTO;
 import com.gestaofinanceirapessoal.repositories.CentroCustoRepository;
+import com.gestaofinanceirapessoal.repositories.UsuarioRepository;
 import com.gestaofinanceirapessoal.services.exceptions.DataIntegrityViolationException;
 import com.gestaofinanceirapessoal.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class CentroCustoService {
 
     @Autowired
     private CentroCustoRepository centroCustoRepo;
+
+    @Autowired
+    private UsuarioRepository usuarioRepo;
 
     public List<CentroCustoDTO> findAll() {
         return centroCustoRepo.findAll().stream()
@@ -31,6 +35,12 @@ public class CentroCustoService {
     public CentroCusto create(CentroCustoDTO dto) {
         dto.setId(null);
         CentroCusto obj = new CentroCusto(dto);
+
+        if (dto.getUsuarioId() != null) {
+            obj.setUsuario(usuarioRepo.findById(dto.getUsuarioId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado! Id: " + dto.getUsuarioId())));
+        }
+
         return centroCustoRepo.save(obj);
     }
 
@@ -38,6 +48,12 @@ public class CentroCustoService {
         dto.setId(id);
         CentroCusto oldObj = findById(id);
         oldObj = new CentroCusto(dto);
+
+        if (dto.getUsuarioId() != null) {
+            oldObj.setUsuario(usuarioRepo.findById(dto.getUsuarioId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado! Id: " + dto.getUsuarioId())));
+        }
+
         return centroCustoRepo.save(oldObj);
     }
 

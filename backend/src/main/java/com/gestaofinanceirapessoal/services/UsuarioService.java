@@ -2,6 +2,8 @@ package com.gestaofinanceirapessoal.services;
 
 import com.gestaofinanceirapessoal.domains.Usuario;
 import com.gestaofinanceirapessoal.domains.dtos.UsuarioDTO;
+import com.gestaofinanceirapessoal.repositories.ContaRepository;
+import com.gestaofinanceirapessoal.repositories.CentroCustoRepository;
 import com.gestaofinanceirapessoal.repositories.UsuarioRepository;
 import com.gestaofinanceirapessoal.services.exceptions.DataIntegrityViolationException;
 import com.gestaofinanceirapessoal.services.exceptions.ObjectNotFoundException;
@@ -21,6 +23,12 @@ public class UsuarioService {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private ContaRepository contaRepo;
+
+    @Autowired
+    private CentroCustoRepository centroCustoRepo;
 
     public List<UsuarioDTO> findAll() {
         return usuarioRepo.findAll().stream()
@@ -48,20 +56,48 @@ public class UsuarioService {
         dto.setSenha(encoder.encode(dto.getSenha())); // ok ✅
         validaCpfEmail(dto);
         Usuario obj = new Usuario(dto);
+
+        if (dto.getContasIds() != null && !dto.getContasIds().isEmpty()) {
+            obj.setContas(dto.getContasIds().stream()
+                    .map(id -> contaRepo.findById(id)
+                            .orElseThrow(() -> new ObjectNotFoundException("Conta não encontrada! Id: " + id)))
+                    .collect(Collectors.toList()));
+        }
+
+        if (dto.getCentrosCustoIds() != null && !dto.getCentrosCustoIds().isEmpty()) {
+            obj.setCentrosCusto(dto.getCentrosCustoIds().stream()
+                    .map(id -> centroCustoRepo.findById(id)
+                            .orElseThrow(() -> new ObjectNotFoundException("Centro de Custo não encontrado! Id: " + id)))
+                    .collect(Collectors.toList()));
+        }
+
         return usuarioRepo.save(obj);
     }
 
-    public Usuario update(Long id, UsuarioDTO dto) {
-        Usuario oldObj = findById(id);
+    public Usuario update(Long usuarioId, UsuarioDTO dto) {
+        Usuario oldObj = findById(usuarioId);
         validaCpfEmail(dto);
 
-        // Atualiza apenas os campos mutáveis
         oldObj.setNome(dto.getNome());
         oldObj.setCpf(dto.getCpf());
         oldObj.setEmail(dto.getEmail());
 
         if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
             oldObj.setSenha(encoder.encode(dto.getSenha()));
+        }
+
+        if (dto.getContasIds() != null && !dto.getContasIds().isEmpty()) {
+            oldObj.setContas(dto.getContasIds().stream()
+                    .map(contaId -> contaRepo.findById(contaId)
+                            .orElseThrow(() -> new ObjectNotFoundException("Conta não encontrada! Id: " + contaId)))
+                    .collect(Collectors.toList()));
+        }
+
+        if (dto.getCentrosCustoIds() != null && !dto.getCentrosCustoIds().isEmpty()) {
+            oldObj.setCentrosCusto(dto.getCentrosCustoIds().stream()
+                    .map(centroCustoId -> centroCustoRepo.findById(centroCustoId)
+                            .orElseThrow(() -> new ObjectNotFoundException("Centro de Custo não encontrado! Id: " + centroCustoId)))
+                    .collect(Collectors.toList()));
         }
 
         return usuarioRepo.save(oldObj);
